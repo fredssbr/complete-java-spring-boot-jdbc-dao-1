@@ -20,17 +20,75 @@ public class SellerDaoJDBC implements SellerDao {
 
     @Override
     public void insert(Seller seller) {
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        try {
+            statement = connection.prepareStatement("insert into seller " +
+                            "(name, email, birthdate, basesalary, departmentid) " +
+                            " values (?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
 
+            statement.setString(1, seller.getName());
+            statement.setString(2, seller.getEmail());
+            statement.setDate(3, new Date(seller.getBirthDate().getTime()));
+            statement.setDouble(4, seller.getBaseSalary());
+            statement.setInt(5, seller.getDepartment().getId());
+
+            int rowsAffected = statement.executeUpdate();
+            if(rowsAffected > 0) {
+                resultSet = statement.getGeneratedKeys();
+                resultSet.next();
+                seller.setId(resultSet.getInt(1));
+            }
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage());
+        } finally {
+            DB.closeStatement(statement);
+            DB.closeResultSet(resultSet);
+        }
     }
 
     @Override
     public void update(Seller seller) {
+        PreparedStatement statement = null;
+        try {
+            statement = connection.prepareStatement("update seller set " +
+                            "name = ?, email = ?, birthdate = ?, basesalary = ?, departmentid = ? " +
+                            " where id = ?");
 
+            statement.setString(1, seller.getName());
+            statement.setString(2, seller.getEmail());
+            statement.setDate(3, new Date(seller.getBirthDate().getTime()));
+            statement.setDouble(4, seller.getBaseSalary());
+            statement.setInt(5, seller.getDepartment().getId());
+            statement.setInt(6, seller.getId());
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage());
+        } finally {
+            DB.closeStatement(statement);
+        }
     }
 
     @Override
     public void deleteById(Integer id) {
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        try {
+            statement = connection.prepareStatement("delete from seller where id = ?");
 
+            statement.setInt(1, id);
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage());
+        } finally {
+            DB.closeStatement(statement);
+            DB.closeResultSet(resultSet);
+        }
     }
 
     @Override
