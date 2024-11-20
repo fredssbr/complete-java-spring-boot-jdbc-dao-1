@@ -1,6 +1,7 @@
 package application;
 
 import model.dao.DaoFactory;
+import model.dao.DepartmentDao;
 import model.dao.SellerDao;
 import model.entities.Department;
 import model.entities.Seller;
@@ -11,6 +12,43 @@ import java.util.Scanner;
 
 public class Program {
     public static void main(String[] args) {
+        // testSeller();
+        testDepartment();
+    }
+
+    private static void testDepartment() {
+        DepartmentDao departmentDao = DaoFactory.createDepartmentDao();
+
+        System.out.println("--- Department - findById(3) ---");
+        System.out.println(departmentDao.findById(3));
+
+        System.out.println("--- Department - findAll() ---");
+        List<Department> departments = departmentDao.findAll();
+        for (Department department : departments) {
+            System.out.println(department);
+        }
+
+        System.out.println("--- Department - insert(Department) ---");
+        Department departmentToInsert = new Department(
+                null,
+                "Music"
+        );
+        departmentDao.insert(departmentToInsert);
+        System.out.println("Department inserted with id: " + departmentToInsert.getId());
+
+        System.out.println("--- Department - update(Department) ---");
+        departmentToInsert.setName("Music and orchestra");
+        departmentDao.update(departmentToInsert);
+        System.out.println("Department updated.");
+
+        System.out.println("--- Department - delete(id) ---");
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter an id to delete: ");
+        departmentDao.deleteById(scanner.nextInt());
+        System.out.println("Department deleted.");
+    }
+
+    private static void testSeller() {
         SellerDao sellerDao = DaoFactory.createSellerDao();
 
         System.out.println("--- Seller - findById(3) ---");
@@ -51,6 +89,5 @@ public class Program {
         System.out.print("Enter an id to delete: ");
         sellerDao.deleteById(scanner.nextInt());
         System.out.println("Seller deleted.");
-
     }
 }
