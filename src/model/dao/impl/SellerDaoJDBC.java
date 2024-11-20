@@ -7,6 +7,7 @@ import model.entities.Department;
 import model.entities.Seller;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SellerDaoJDBC implements SellerDao {
@@ -56,6 +57,57 @@ public class SellerDaoJDBC implements SellerDao {
         }
     }
 
+
+    @Override
+    public List<Seller> findByDepartment(Integer departmentId) {
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        try {
+            statement = connection.prepareStatement("select s.*, d.name \"departmentname\" \n" +
+                    "from seller s inner join department d\n" +
+                    "on s.departmentid  = d.id\n" +
+                    "where s.departmentid  = ?");
+            statement.setInt(1, departmentId);
+            resultSet = statement.executeQuery();
+
+            List<Seller> sellers = new ArrayList<>();
+            while(resultSet.next()) {
+                sellers.add(mapResultSetToSeller(resultSet));
+            }
+            return sellers;
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage());
+        } finally {
+            DB.closeStatement(statement);
+            DB.closeResultSet(resultSet);
+        }
+    }
+
+    @Override
+    public List<Seller> findAll() {
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        try {
+            statement = connection.prepareStatement("select s.*, d.name \"departmentname\" \n" +
+                    "from seller s inner join department d\n" +
+                    "on s.departmentid  = d.id\n" +
+                    "order by s.name");
+
+            resultSet = statement.executeQuery();
+
+            List<Seller> sellers = new ArrayList<>();
+            while(resultSet.next()) {
+                sellers.add(mapResultSetToSeller(resultSet));
+            }
+            return sellers;
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage());
+        } finally {
+            DB.closeStatement(statement);
+            DB.closeResultSet(resultSet);
+        }
+    }
+
     private Seller mapResultSetToSeller(ResultSet resultSet) throws SQLException {
 
         Department department = new Department(
@@ -71,15 +123,5 @@ public class SellerDaoJDBC implements SellerDao {
                 department
         );
 
-    }
-
-    @Override
-    public Seller findByDepartment(Integer departmentId) {
-        return null;
-    }
-
-    @Override
-    public List<Seller> findAll() {
-        return null;
     }
 }
