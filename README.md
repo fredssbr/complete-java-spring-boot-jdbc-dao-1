@@ -40,8 +40,8 @@ class ProductDao {
 }
 
 class DaoFactory {
-    + createClientDao() ClientDao
-    + createProductDao() ProductDao
+    + createClientDao()$ ClientDao
+    + createProductDao()$ ProductDao
 }
 
 class ClientDaoJDBC
